@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Con Amor para Lorena</title>
+    <style>
+        /* Base styles and gradient background */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a001a 100%);
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Centered love button container */
+        .button-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .button-container.show {
+            opacity: 1;
+        }
+
+        /* Floating heart button */
+        .love-button {
+            background: rgba(255, 100, 180, 0.2);
+            border: 2px solid rgba(255, 100, 180, 0.5);
+            border-radius: 50px;
+            padding: 15px 30px;
+            color: #ff64b4;
+            cursor: pointer;
+            font-size: 24px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            text-shadow: 0 0 8px rgba(255, 100, 180, 0.6);
+            animation: gentlePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes gentlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .love-button:hover {
+            background: rgba(255, 100, 180, 0.3);
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(255, 100, 180, 0.5);
+        }
+
+        /* Button hint */
+        .button-hint {
+            margin-top: 20px;
+            color: rgba(255, 100, 180, 0.7);
+            font-size: 16px;
+            text-shadow: 0 0 5px rgba(255, 100, 180, 0.4);
+            animation: fadeInOut 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Discreet touch hint */
+        .touch-hint {
+            position: fixed;
+    top: calc(50% + 60px); /* Just below the main message */
+    left: 50%;
+    transform: translateX(-50%);
+            text-align: center;
+width: 100%;
+    color: rgba(255, 100, 180, 0.4);
+    font-size: 14px;
+    text-shadow: 0 0 3px rgba(255, 100, 180, 0.3);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+        }
+
+        .touch-hint.show {
+            opacity: 1;
+        }
+
+        /* Canvas overlay */
+        .canvas-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .canvas-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Main love message */
+        .main-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 1s ease;
+            pointer-events: none;
+        }
+
+        .main-message.show {
+            opacity: 1;
+        }
+
+        .main-message h1 {
+            font-size: 3rem;
+            color: #ff64b4;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(255, 100, 180, 0.8);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+
+
+        /* Control panel */
+        .control-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 100, 180, 0.3);
+            z-index: 30;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-panel.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .control-panel h3 {
+            color: #ff64b4;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px rgba(255, 100, 180, 0.5);
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            color: #ff64b4;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .control-group input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid rgba(255, 100, 180, 0.3);
+            background: rgba(0, 0, 0, 0.5);
+            color: #ff64b4;
+            border-radius: 5px;
+        }
+
+        .back-button {
+            background: rgba(255, 100, 180, 0.2);
+            border: 1px solid rgba(255, 100, 180, 0.5);
+            color: #ff64b4;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            margin-top: 10px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 100, 180, 0.3);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-message h1 {
+                font-size: 2rem;
+            }
+            
+            .timed-message p {
+                font-size: 1.2rem;
+            }
+            
+            .control-panel {
+                left: 10px;
+                right: 10px;
+                width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Centered button container with hint -->
+    <div class="button-container" id="buttonContainer">
+        <button class="love-button" id="loveButton">❤️ Empezar</button>
+        <div class="button-hint">Presiona para Continuar</div>
+    </div>
+
+    <!-- Discreet touch hint -->
+    <div class="touch-hint" id="touchHint">Toca la pantalla para ver la magia ✨</div>
+
+    <!-- Canvas overlay for falling text/hearts -->
+    <div class="canvas-overlay" id="canvasOverlay">
+        <canvas id="loveCanvas"></canvas>
+    </div>
+
+    <!-- Main love message -->
+    <div class="main-message" id="mainMessage">
+        <h1>Con Amor para Lorena</h1>
+    </div>
+
+    <!-- Timed message -->
+    <div class="timed-message" id="timedMessage">
+        <p id="timedMessageText">Eres Perfecta</p>
+    </div>
+
+    <!-- Control panel (hidden by default) -->
+    <div class="control-panel" id="controlPanel">
+        <h3>Love Controls</h3>
+        <div class="control-group">
+            <label for="speedSlider">Fall Speed:</label>
+            <input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <label for="colorPicker">Color:</label>
+            <input type="color" id="colorPicker" value="#ff64b4">
+        </div>
+        <div class="control-group">
+            <label for="densitySlider">Particle Density:</label>
+            <input type="range" id="densitySlider" min="1" max="10" value="5">
+        </div>
+        <button class="back-button" id="backButton">Back</button>
+    </div>
+
+    <script>
+        // Global variables
+        let canvas, ctx;
+        let particles = [];
+        let heartBursts = [];
+        let animationId;
+        let isAnimating = false;
+        let currentTextMode = 'Te Amo';
+        let textModeTimeout;
+        let timedMessageShown = false;
+        let timedMessageIndex = 0;
+        let controlsVisible = false;
+        let specialMessageActive = false;
+        
+        // Configuration
+        const config = {
+            fallSpeed: 1,
+            color: '#ff64b4',
+            density: 5,
+            maxParticles: 50
+        };
+
+        // Timed messages array
+        const timedMessages = [
+  "Eres perfecta",
+  "My Love",
+  "Te pienso",
+  "Forever",
+  "Mi cielo",
+  "Always",
+  "Mi todo",
+  "Angel",
+  "Te amo",
+  "Sweetheart",
+  "Contigo",
+  "Mine",
+  "Te extraño",
+  "Baby",
+  "Latidos",
+  "Love",
+  "Mi Sol",
+  "Us",
+  "Para siempre",
+  "You"
+];
+
+        // Particle class for falling text and hearts
+        class Particle {
+            constructor(type = 'text', customText = null) {
+                this.type = type;
+                this.x = Math.random() * canvas.width;
+                this.y = -50;
+                this.size = Math.random() * 24 + 12; // 12-36px
+                this.opacity = Math.random() * 0.7 + 0.3;
+                this.speed = Math.random() * 2 + 1;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = (Math.random() - 0.5) * 2;
+                
+                // Determine text content
+                if (customText) {
+                    this.text = customText;
+                    this.isSpecialMessage = true;
+                    this.size = Math.random() * 10 + 20; // Larger for special messages
+                    this.opacity = 0.9; // More visible
+                    this.speed = Math.random() * 1.5 + 0.5; // Slower fall
+                } else if (this.type === 'text') {
+                    this.text = specialMessageActive ? timedMessages[timedMessageIndex] : currentTextMode;
+                    this.isSpecialMessage = false;
+                } else {
+                    this.text = '❤';
+                    this.isSpecialMessage = false;
+                }
+                
+                this.hovered = false;
+                this.glowIntensity = 0;
+            }
+
+            update() {
+                // Apply speed modifier from controls
+                const speedMultiplier = this.hovered ? 0.3 : config.fallSpeed;
+                this.y += this.speed * speedMultiplier;
+                
+                if (this.type === 'heart') {
+                    this.rotation += this.rotationSpeed;
+                }
+
+                // Update glow effect
+                if (this.hovered) {
+                    this.glowIntensity = Math.min(this.glowIntensity + 0.05, 1);
+                } else {
+                    this.glowIntensity = Math.max(this.glowIntensity - 0.05, 0);
+                }
+
+                // Remove if off screen
+                return this.y < canvas.height + 50;
+            }
+
+            draw() {
+                ctx.save();
+                
+                // Set color and opacity
+                let color = config.color;
+                // Special messages get a different color/glow
+                if (this.isSpecialMessage) {
+                    color = '#ffb3e6'; // Lighter pink for special messages
+                }
+                
+                ctx.fillStyle = color;
+                ctx.globalAlpha = this.opacity;
+                
+                // Apply glow effect
+                const glowSize = this.isSpecialMessage ? 15 + (this.glowIntensity * 10) : 8 + (this.glowIntensity * 12);
+                ctx.shadowColor = color;
+                ctx.shadowBlur = glowSize;
+                
+                // Set font for text
+                if (this.type === 'text') {
+                    ctx.font = `${this.size}px 'Courier New', monospace`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText(this.text, this.x, this.y);
+                } else {
+                    // Draw heart with rotation
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.rotation * Math.PI / 180);
+                    ctx.font = `${this.size}px serif`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText('❤', 0, 0);
+                }
+                
+                ctx.restore();
+            }
+
+            isPointInside(x, y) {
+                const distance = Math.sqrt((x - this.x) ** 2 + (y - this.y) ** 2);
+                return distance < this.size;
+            }
+        }
+
+        // Heart burst particle class
+        class HeartBurst {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 8;
+                this.vy = (Math.random() - 0.5) * 8;
+                this.life = 1;
+                this.decay = 0.02;
+                this.size = Math.random() * 20 + 10;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vx *= 0.98;
+                this.vy *= 0.98;
+                this.life -= this.decay;
+                return this.life > 0;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = config.color;
+                ctx.shadowColor = config.color;
+                ctx.shadowBlur = 15;
+                ctx.font = `${this.size}px serif`;
+                ctx.textAlign = 'center';
+                ctx.fillText('❤', this.x, this.y);
+                ctx.restore();
+            }
+        }
+
+        // Initialize the application
+        function init() {
+            // Show button after 2 seconds
+            setTimeout(() => {
+                document.getElementById('buttonContainer').classList.add('show');
+            }, 1000);
+
+            // Set up event listeners
+            setupEventListeners();
+        }
+
+        // Set up all event listeners
+        function setupEventListeners() {
+            const loveButton = document.getElementById('loveButton');
+            const canvasOverlay = document.getElementById('canvasOverlay');
+            const controlPanel = document.getElementById('controlPanel');
+            const backButton = document.getElementById('backButton');
+            
+            // Love button click
+            loveButton.addEventListener('click', startLoveAnimation);
+            
+            // Canvas click to cycle through special messages
+            canvasOverlay.addEventListener('click', handleCanvasClick);
+            
+            // Back button
+            backButton.addEventListener('click', exitAnimation);
+            
+            // Control panel inputs
+            document.getElementById('speedSlider').addEventListener('input', (e) => {
+                config.fallSpeed = parseFloat(e.target.value);
+            });
+            
+            document.getElementById('colorPicker').addEventListener('input', (e) => {
+                config.color = e.target.value;
+            });
+            
+            document.getElementById('densitySlider').addEventListener('input', (e) => {
+                config.density = parseInt(e.target.value);
+            });
+
+            // Keyboard events
+            document.addEventListener('keydown', handleKeyPress);
+            
+            // Canvas events will be set up when canvas is created
+        }
+
+        // Handle keyboard input
+        function handleKeyPress(e) {
+            if (e.key === 'Escape') {
+                exitAnimation();
+            } else if (e.key.toLowerCase() === 'm' && isAnimating) {
+                toggleControlPanel();
+            }
+        }
+
+        // Toggle control panel visibility
+        function toggleControlPanel() {
+            controlsVisible = !controlsVisible;
+            const panel = document.getElementById('controlPanel');
+            panel.classList.toggle('show', controlsVisible);
+        }
+
+        // Start the love animation
+        function startLoveAnimation() {
+            // Hide button container
+            document.getElementById('buttonContainer').classList.remove('show');
+            
+            // Show canvas overlay and touch hint
+            const canvasOverlay = document.getElementById('canvasOverlay');
+            canvasOverlay.classList.add('show');
+            
+            // Show touch hint after a delay
+            setTimeout(() => {
+                document.getElementById('touchHint').classList.add('show');
+            }, 1000);
+            
+            // Set up canvas
+            setupCanvas();
+            
+            // Show main message
+            setTimeout(() => {
+                document.getElementById('mainMessage').classList.add('show');
+            }, 500);
+            
+            // Start particle animation
+            isAnimating = true;
+            animate();
+            
+            // Show timed message after 25 seconds
+            setTimeout(() => {
+                if (isAnimating) {
+                    showTimedMessage();
+                }
+            }, 1000);
+        }
+
+        // Set up canvas and event listeners
+        function setupCanvas() {
+            canvas = document.getElementById('loveCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Canvas event listeners
+            canvas.addEventListener('click', handleCanvasClick);
+            canvas.addEventListener('dblclick', handleCanvasDoubleClick);
+            canvas.addEventListener('mousemove', handleCanvasMouseMove);
+        }
+
+        // Resize canvas to fit window
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        // Handle single click on canvas
+        function handleCanvasClick(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Create heart burst
+            for (let i = 0; i < 8 + Math.random() * 5; i++) {
+                heartBursts.push(new HeartBurst(x, y));
+            }
+            
+            // If special message is active, cycle through messages
+            if (timedMessageShown && specialMessageActive) {
+                cycleTimedMessage();
+            }
+        }
+
+        // Handle double click on canvas
+        function handleCanvasDoubleClick(e) {
+            // Switch text mode
+            currentTextMode = 'My Love';
+            
+            // Clear existing timeout
+            if (textModeTimeout) {
+                clearTimeout(textModeTimeout);
+            }
+            
+            // Revert after 10 seconds
+            textModeTimeout = setTimeout(() => {
+                currentTextMode = 'Te Amo';
+            }, 10000);
+        }
+
+        // Handle mouse move for hover effects
+        function handleCanvasMouseMove(e) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            // Check hover state for particles
+            particles.forEach(particle => {
+                particle.hovered = particle.isPointInside(mouseX, mouseY);
+            });
+        }
+
+        // Show timed message as falling text
+        function showTimedMessage() {
+            if (!timedMessageShown) {
+                timedMessageShown = true;
+                specialMessageActive = true;
+                
+                // Spawn several instances of the special message
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        particles.push(new Particle('text', timedMessages[timedMessageIndex]));
+                    }, i * 1000); // Stagger the spawning
+                }
+            }
+        }
+
+        // Cycle through timed messages
+        function cycleTimedMessage() {
+            timedMessageIndex = (timedMessageIndex + 1) % timedMessages.length;
+            
+            // Spawn new special message particles
+            for (let i = 0; i < 2; i++) {
+                setTimeout(() => {
+                    particles.push(new Particle('text', timedMessages[timedMessageIndex]));
+                }, i * 500);
+            }
+        }
+
+        // Main animation loop
+        function animate() {
+            if (!isAnimating) return;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Spawn new particles
+            if (particles.length < config.maxParticles && Math.random() < config.density / 100) {
+                const type = Math.random() < 0.15 ? 'heart' : 'text';
+                particles.push(new Particle(type));
+            }
+            
+            // Update and draw particles
+            particles = particles.filter(particle => {
+                particle.update();
+                particle.draw();
+                return particle.y < canvas.height + 50;
+            });
+            
+            // Update and draw heart bursts
+            heartBursts = heartBursts.filter(burst => {
+                burst.update();
+                burst.draw();
+                return burst.life > 0;
+            });
+            
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Exit animation and return to initial state
+        function exitAnimation() {
+            isAnimating = false;
+            
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            
+            // Clear particles
+            particles = [];
+            heartBursts = [];
+            
+            // Hide all overlays
+            document.getElementById('canvasOverlay').classList.remove('show');
+            document.getElementById('mainMessage').classList.remove('show');
+            document.getElementById('controlPanel').classList.remove('show');
+            document.getElementById('touchHint').classList.remove('show');
+            
+            // Reset states
+            timedMessageShown = false;
+            timedMessageIndex = 0;
+            controlsVisible = false;
+            currentTextMode = 'Te Amo';
+            specialMessageActive = false;
+            
+            // Clear timeouts
+            if (textModeTimeout) {
+                clearTimeout(textModeTimeout);
+            }
+            
+            // Show button container again
+            setTimeout(() => {
+                document.getElementById('buttonContainer').classList.add('show');
+            }, 500);
+        }
+
+        // Start the application when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
