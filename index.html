@@ -697,6 +697,19 @@ width: 100%;
 
         // Start the application when page loads
         window.addEventListener('load', init);
+    
     </script>
+    <audio id="bgMusic" src="song.mp3" loop autoplay></audio>
+    
+    <script>
+    window.addEventListener('click', () => {
+        const audio = document.getElementById('bgMusic');
+        if (audio.paused) {
+            audio.play().catch(e => {
+                console.warn("No se pudo reproducir automáticamente:", e);
+            });
+        }
+    }, { once: true });
+</script>
 </body>
 </html>
